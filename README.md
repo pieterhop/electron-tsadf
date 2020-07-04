@@ -2,7 +2,7 @@
 
 TSADF is a cross-platform desktop application which can be used for detecting anomalies in time series data. The application is based on the anomaly detection framework developed by [Dr. Ilias Gerostathopoulos](http://www4.in.tum.de/~gerostat/) and colleagues, and serves mainly as a intuitive user-interface for this framework. Additional functionalities on this framework included in this application are a time series interval check and a preview functionality. See the instructions below for installing this application.
 
-## To Use TSADF
+## Install instructions
 
 To clone and run this repository you'll need [Git](https://git-scm.com), [Node.js](https://nodejs.org/en/download/) (which comes with [npm](http://npmjs.com)) and [Flask] ()installed on your computer. From your command line:
 
