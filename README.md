@@ -24,6 +24,10 @@ npm start
 
 Note: If you're using Linux Bash for Windows, [see this guide](https://www.howtogeek.com/261575/how-to-run-graphical-linux-desktop-applications-from-windows-10s-bash-shell/) or use `node` from the command prompt.
 
+## Contact
+
+If you run into any problems, feel free to contact me: pieterhoppenbrouwers@hotmail.com
+
 ## License
 
 This project is licensed under an MIT license
