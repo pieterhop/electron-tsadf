@@ -1,5 +1,4 @@
 const {ipcRenderer, shell} = require('electron')
-const {PythonShell} = require('python-shell')
 
 ipcRenderer.on('results', (event, results, data) => {
   document.getElementById('file').innerHTML = data.file;

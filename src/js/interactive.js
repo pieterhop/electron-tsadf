@@ -1,5 +1,4 @@
 const {ipcRenderer, shell} = require('electron')
-const {PythonShell} = require('python-shell')
 
 document.getElementById('boolean-no').onclick = function() {
   var boolean = 'n'
