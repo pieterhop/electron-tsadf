@@ -27,4 +27,4 @@ Note: If you're using Linux Bash for Windows, [see this guide](https://www.howto
 
 ## License
 
-This project is under an MIT license
+This project is licensed under an MIT license
