@@ -1,6 +1,6 @@
 # TSADF - An anomaly detection application
 
-TSADF is a cross-platform desktop application which can be used for detecting anomalies in time series data. The application is based on the anomaly detection framework developed by [Dr. Ilias Gerostathopoulos](http://www4.in.tum.de/~gerostat/) and colleagues, and serves mainly as a intuitive user-interface for this framework. Additional functionalities on this framework included in this application are a time series interval check and a preview functionality. See the instructions below for installing this application.
+TSADF is a cross-platform desktop application which can be used for detecting anomalies in time series data. The application is based on the anomaly detection framework developed by [Dr. Ilias Gerostathopoulos](https://github.com/iliasger) and colleagues, and serves mainly as a intuitive user-interface for this framework. Additional functionalities on this framework included in this application are a time series interval check and a preview functionality. See the instructions below for installing this application.
 
 ## Install instructions
 
