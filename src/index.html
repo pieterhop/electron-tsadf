@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
+    <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'">
+    <link rel="stylesheet" href="css/bootstrap/bootstrap.css" />
+    <link rel="stylesheet" href="css/main/index.css" />
+    <title>TSADF</title>
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="title">TSADF</h1>
+      <div class="row">
+        <div class="col-sm-10">
+          <p class="desc">
+            Welcome to the Time Series Anomaly Detection Framework. This is a
+            tool for detecting anomalies in time series. Please select
+            a file below to get started. Hover over the input sections to see a
+            description of the expected input. Press start to start the anomaly
+            detection or choose preview of the provided input file. Please see the
+            <a href="https://github.com/pieterhop/electron-tsadf" target="_blank">project page</a>
+            for feedback, contribute or any project related questions.
+          </p>
+        </div>
+        <div class="col-sm-2">
+          <img class="float-right" src="img/tsadf_logo.png" height="100px" width="100px" alt="">
+        </div>
+      </div>
+      <hr>
+      <div class="row">
+        <div class="col-sm">
+          <section id="file">
+            <h4>File</h4>
+            <input type="file" class="form-control-file" accept=".csv" name="file" id="select-file" required>
+          </section>
+          <section id="avr">
+            <h4>Acceptable value range</h4>
+            <div class="row">
+              <div class="col-sm-4">
+                <label for="lower-bound">Lower boundary</label>
+                <input type="number" class="form-control form-control-sm" id="lower-bound" name="lower-bound" placeholder="start range" value="0" required>
+              </div>
+              <div class="col-sm-4">
+                <label for="upper-bound">Upper boundary</label>
+                <input type="number" class="form-control form-control-sm" id="upper-bound" name="upper-bound" placeholder="end range" value="100000" required>
+              </div>
+            </div>
+          </section>
+          <section id="tsf">
+            <h4>Time series frequency</h4>
+            <div class="row">
+              <div class="col-sm-4">
+                <label for="tsf-amount">Amount</label><br>
+                <input type="number" class="form-control form-control-sm" id="tsf-amount" name="tsf-amount" placeholder="amount" value="96" required>
+              </div>
+              <div class="col-sm-4">
+                <label for="tsf-unit">Units</label><br>
+                <select name="tsf-unit" class="form-control form-control-sm" id="tsf-unit" required>
+                  <option value="milliseconds" disabled selected>units</option>
+                  <option value="milliseconds">milliseconds</option>
+                  <option value="seconds">seconds</option>
+                  <option value="minutes">minutes</option>
+                  <option value="hours">hours</option>
+                  <option value="days">days</option>
+                  <option value="weeks">weeks</option>
+                </select>
+              </div>
+            </div>
+          </section>
+          <section id="seas">
+            <h4>Seasonality</h4>
+            <div class="row">
+              <div class="col-sm-8">
+                <select name="seasonality" class="form-control form-control-sm" id="seasonality" required>
+                  <option value="automatic">Detect</option>
+                  <option value="hourly">Hourly</option>
+                  <option value="daily">Daily</option>
+                  <option value="weekly">Weekly</option>
+                  <option value="monthly">Monthly</option>
+                </select>
+              </div>
+            </div>
+          </section>
+          <section id="threshold">
+            <h4>Threshold selection method</h4>
+            <div class="row">
+              <div class="col-sm-8">
+                <select name="tsm" class="form-control form-control-sm" id="tsm" required>
+                  <option value="automatic">Automatic</option>
+                  <option value="interactive">Interactive</option>
+                </select>
+              </div>
+            </div>
+          </section>
+        </div>
+        <div class="col-sm">
+          <section class="help">
+            <h4>Help</h4>
+            <p id="help-desc">Select an input file to get started. The supported format is .csv</p>
+          </section>
+          <section id="buttons">
+            <button id="start-tsadf-button" type="button" name="button" class="btn btn-secondary">Start</button>
+            <button id="plot-preview" type="button" name="button" class="btn btn-secondary">Preview</button>
+          </section>
+        </div>
+      </div>
+    </div>
+    <script src="js/index.js"></script>
+  </body>
+</html>

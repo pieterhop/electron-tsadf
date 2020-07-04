@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
+    <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'">
+    <link rel="stylesheet" href="css/bootstrap/bootstrap.css" />
+    <link rel="stylesheet" href="css/main/index.css" />
+    <title>TSADF</title>
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="title">Results</h1>
+      <p class="desc">
+        Success! We've found some anomalies in your time series... Please find
+        the details of your detection below.
+      </p>
+      <div class="row">
+        <div class="col-sm-6">
+          <h4>Input</h4>
+            <p>This is the configuration for this detection.</p>
+          </div>
+        <div class="col-sm-6">
+          <h4>Output</h4>
+          <p>These are the results of your output. Please reset for another
+            detection or save your results in a detection report.</p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-5">
+          <table class="table table-dark">
+            <thead>
+              <tr>
+                <th scope="col">Field</th>
+                <th scope="col">Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>File</td>
+                <td id="file"></td>
+              </tr>
+              <tr>
+                <td>Lowerbound</td>
+                <td id="lowerbound"></td>
+              </tr>
+              <tr>
+                <td>Upperbound</td>
+                <td id="upperbound"></td>
+              </tr>
+              <tr>
+                <td>Frequency</td>
+                <td id="tsf"></td>
+              </tr>
+              <tr>
+                <td>Seasonality</td>
+                <td id="seasonality"></td>
+              </tr>
+              <tr>
+                <td>Method</td>
+                <td id="tsm"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="col-sm-1"></div>
+        <div class="col-sm-5">
+          <table class="table table-dark">
+            <thead>
+              <tr>
+                <th scope="col">Basis</th>
+                <th scope="col">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Point distance</td>
+                <td id="pd"></td>
+              </tr>
+              <tr>
+                <td>Difference distance</td>
+                <td id="dd"></td>
+              </tr>
+              <tr>
+                <td>Point difference distance</td>
+                <td id="common"></td>
+              </tr>
+              <tr>
+                <td>Non-contextual</td>
+                <td id="extreme"></td>
+              </tr>
+            </tbody>
+          </table>
+          <button id="return-main" type="button" name="button" class="btn btn-secondary">Reset</button>
+        </div>
+      </div>
+    </div>
+    <script src="js/results.js"></script>
+  </body>
+</html>

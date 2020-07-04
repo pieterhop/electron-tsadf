@@ -1,0 +1,30 @@
+html {
+  width: 100%;
+}
+
+body {
+  color: #383A3C;
+  margin-top: 40px;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    color: #ddd;
+    background-color: #383A3C;
+  }
+}
+
+section:not(:nth-child(5)) {
+  padding-bottom: 22px;
+  border-bottom: 1px solid #545454;
+  margin-bottom: 18px;
+}
+
+hr {
+  border-top: 1px solid #545454;
+}
+
+.help {
+  display: block;
+  height: 228px;
+}
