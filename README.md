@@ -18,6 +18,7 @@ npm install
 # Start flask web-server
 python flask/main.py
 # Run the app
+# open new window
 npm start
 ```
 
