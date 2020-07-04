@@ -26,7 +26,7 @@ Note: If you're using Linux Bash for Windows, [see this guide](https://www.howto
 
 ## Contact
 
-If you run into any problems, feel free to contact me: pieterhoppenbrouwers@hotmail.com
+If you run into any problems, feel free to contact me any time at the contact details on my profile
 
 ## License
 
