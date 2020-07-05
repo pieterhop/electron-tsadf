@@ -18,12 +18,17 @@ npm install
 # Start flask web-server
 python flask/main.py
 # Run the app
+# open new window
 npm start
 ```
 
 Note: use the provided time series file (sample_data.csv) for testing.
 
 Note: If you're using Linux Bash for Windows, [see this guide](https://www.howtogeek.com/261575/how-to-run-graphical-linux-desktop-applications-from-windows-10s-bash-shell/) or use `node` from the command prompt.
+
+## Contact
+
+If you run into any problems, feel free to contact me any time. Please see the contact details on my profile.
 
 ## License
 
