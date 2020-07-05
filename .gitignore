@@ -3,4 +3,7 @@
 /flask/tsadf/scores.csv
 /flask/tsadf/evaluation
 /flask/test.py
+/flask/tsadf/paper_code.py
+/flask/tsadf/out.csv
+__pycache__
 .DS_Store
