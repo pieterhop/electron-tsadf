@@ -1,4 +1,5 @@
 const {ipcRenderer, shell} = require('electron')
+const path = require('path')
 
 document.getElementById('start-tsadf-button').onclick = function() {
   var invalid = false
@@ -8,7 +9,7 @@ document.getElementById('start-tsadf-button').onclick = function() {
     data["file"] = document.getElementById('select-file').files[0].path
   }
   // temporary
-  data["file"] = "/Users/pieterhop/Documents/VU/Jaar 4/Semester 2/Thesis/Prototype/tsadf/flask/tsadf/sample_data.csv"
+  data["file"] = path.join(__dirname, '../sample_data.csv')
   data["lowerbound"]  = document.getElementById('lower-bound').value
   data["upperbound"]  = document.getElementById('upper-bound').value
   data["tsf_amount"] = document.getElementById('tsf-amount').value

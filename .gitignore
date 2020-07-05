@@ -1,2 +1,6 @@
 /node_modules
+/src/img/temp/*
+/flask/tsadf/scores.csv
+/flask/tsadf/evaluation
+/flask/test.py
 .DS_Store
