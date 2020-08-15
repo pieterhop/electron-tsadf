@@ -1,8 +1,10 @@
 import sys
 from flask import Flask, request, jsonify, send_file, url_for, redirect
 from tsadf.main import detect
+from flask_socketio import *
 
 app = Flask(__name__)
+socketio = SocketIO(app, logger=True)
 
 @app.route("/")
 def data():
@@ -20,7 +22,6 @@ def data():
     # p.start()
     # p.join()
 
-
     return jsonify(detect(ts, freq, method, lower, higher))
 
     # response = send_file(tempFileObj, as_attachment=True, attachment_filename='detailed_plot.png')
@@ -32,4 +33,5 @@ def send_bool():
     return redirect(url_for('data'))
 
 if __name__ == "__main__":
-    app.run(host='127.0.0.1', port=5000, debug=True)
+    # app.run(host='127.0.0.1', port=5000, debug=True)
+    socketio.run(app, port=8000, debug=True)

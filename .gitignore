@@ -1,5 +1,5 @@
 /node_modules
-/src/img/temp/*
+/src/img/temp/detailed_plot.png
 /flask/tsadf/scores.csv
 /flask/tsadf/evaluation
 /flask/test.py

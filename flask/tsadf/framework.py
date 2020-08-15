@@ -32,9 +32,8 @@ class TAF:
         if self.threshold_method != 'automatic':
             self.point_distance_score_threshold, itermediate_thresholds1 = self._determine_threshold(self.anomaly_df, 'PDS')
             self.difference_distance_score_threshold, itermediate_thresholds2 = self._determine_threshold(self.anomaly_df, 'DDS')
-
-            print(itermediate_thresholds1)
-            print(itermediate_thresholds2)
+            # print(itermediate_thresholds1)
+            # print(itermediate_thresholds2)
         else:
             self._calculate_mz()
 
@@ -69,8 +68,11 @@ class TAF:
           "extreme_anomalies": len(extreme_an_df)
         }
 
-        return results
-
+        if self.threshold_method == "automatic":
+            return results
+        else:
+            print(results)
+            print("finished")
 
     def _detailed_plot(self, raw_df, col, val_col, an_index, data_points=300, threshold=0, anomaly_count=0):
 
@@ -95,7 +97,7 @@ class TAF:
             if int(an_index[j] + data_points / 2) <= len(raw_df):
                 block_end = int(an_index[j] + data_points / 2)
 
-            print('{}, {}, {}'.format(block_start, block_end, an_index[j]))
+            # print('{}, {}, {}'.format(block_start, block_end, an_index[j]))
 
             try:
 
@@ -155,27 +157,27 @@ class TAF:
         plt.subplots_adjust(top=0.94,bottom=0.075,left=0.04,right=0.97,hspace=0.5,wspace=0.095)
         f.suptitle('Current threshold {}, # of anomalies detected {}'.format(threshold, anomaly_count))
         # plt.show()
-        # plt.savefig('src/img/temp/detailed_plot.png', dpi=500)
+        plt.savefig('src/img/temp/detailed_plot.png', dpi=500)
 
-        buf = BytesIO()
-        fig1 = plt.savefig(buf, format='png', dpi=300)
-        buf.seek(0)
-
-        fig_data = base64.b64encode(buf.getvalue())
-        buf.close()
-
-        data = {
-            "type": "fig",
-            "fig": fig_data
-        }
-
-        print(data)
+        # buf = BytesIO()
+        # fig1 = plt.savefig(buf, format='png', dpi=300)
+        # buf.seek(0)
+        #
+        # fig_data = base64.b64encode(buf.getvalue())
+        # buf.close()
+        #
+        # data = {
+        #     "type": "fig",
+        #     "fig": fig_data
+        # }
+        #
+        # print(data)
 
 
     def preview_plot(self):
         print('plot')
-        _, splts = plt.subplots(1, sharex = True, sharey=True)
-        self.anomaly_df['value'][0:2880].plot(x='time', color='mediumslateblue')
+        _, splts = plt.subplots(1, sharex=True, sharey=True)
+        self.anomaly_df['value'][0:100].plot(x='time', color='mediumslateblue')
         plt.show()
 
         # df.plot(x='date_time', y='price_usd', figsize=(12,6))
@@ -184,74 +186,74 @@ class TAF:
         # plt.title('Time Series of room price by date time of search');
 
 
-    # def final_plot(temp_df, qd_t, dqd_t):
-    #     _, splts = plt.subplots(1, sharex = True, sharey=True)
-    #     index = list()
-    #     range_high = list()
-    #     range_low = list()
-    #     threshold_high = list()
-    #     threshold_low = list()
-    #     diff_range_high = list()
-    #     diff_range_low = list()
-    #     diff_threshold_high = list()
-    #     diff_threshold_low = list()
-    #     qd = list()
-    #     diff_qd = list()
-    #     for i in temp_df.index.values:
-    #         index.append(i)
-    #         range_high.append(temp_df.loc[i]['q3'])
-    #         range_low.append(temp_df.loc[i]['q1'])
-    #         threshold_high.append(temp_df.loc[i]['q3'] + qd_t)
-    #         threshold_low.append(temp_df.loc[i]['q1'] - qd_t)
-    #
-    #         diff_range_high.append(temp_df.loc[i]['diff_q3'])
-    #         diff_range_low.append(temp_df.loc[i]['diff_q1'])
-    #         diff_threshold_high.append(temp_df.loc[i]['diff_q3'] + dqd_t)
-    #         diff_threshold_low.append(temp_df.loc[i]['diff_q1'] - dqd_t)
-    #
-    #
-    #         qd.append(temp_df.loc[i]['qd'])
-    #         diff_qd.append(temp_df.loc[i]['diff_qd'])
-    #
-    #     #splts.fill_between(index, threshold_high, range_high, color='lightblue', alpha=0.3, label='{} quartile distance'.format(qd_t))
-    #     #splts.fill_between(index, range_high, range_low, color='lightblue', alpha=0.8, label='Normal Behavior (1st to 3rd quartile)')
-    #     #splts.fill_between(index, range_low, threshold_low, color='lightblue', alpha=0.4)
-    #     temp_df['value'].plot(ax=splts, color='mediumslateblue')
-    #     s = temp_df[temp_df['qd'] > qd_t]['value']
-    #     splts.scatter(y=s.values, x=s.index.values, color='red', marker='o', label='Anomalies based on point-distance')
-    #
-    #     s2 = temp_df[temp_df['diff_qd'] > dqd_t]['value']
-    #     splts.scatter(y=s2.values, x=s2.index.values, color='orange', marker='x', label='Anomalies based on difference-distance')
-    #
-    #     s3 = temp_df[temp_df['wvs'] == 1000]['value']
-    #     splts.scatter(y=s3.values, x=s3.index.values, color='black', marker='s', label='Non-contextual anomalies')
-    #
-    #     splts.set_title('Anomalies against threshold pair ({}, {})'.format(qd_t, dqd_t))
-    #     splts.legend(bbox_to_anchor=(1,0), loc="lower right", bbox_transform=_.transFigure, ncol=3)
-    #     plt.show()
-    #
-    #     _, splts = plt.subplots(1, sharex = True, sharey=True)
-    #     splts.fill_between(index, threshold_high, range_high, color='lightblue', alpha=0.3, label='{} point distance border'.format(qd_t))
-    #     splts.fill_between(index, range_high, range_low, color='lightblue', alpha=0.8, label='Normal Behavior')
-    #     splts.fill_between(index, range_low, threshold_low, color='lightblue', alpha=0.4)
-    #     temp_df['value'].plot(ax=splts, color='mediumslateblue')
-    #     s_diff = temp_df['value'][(temp_df['qd'] > qd_t)]
-    #     splts.scatter(y=s_diff.values, x=s_diff.index.values, color='orange', marker='x', label='Anomalies')
-    #     splts.set_title('Anomalies against point distance threshold {}'.format(qd_t))
-    #     splts.legend(bbox_to_anchor=(1,0), loc="lower right", bbox_transform=_.transFigure, ncol=3)
-    #
-    #     _, splts = plt.subplots(1, sharex = True, sharey=True)
-    #     splts.fill_between(index, diff_threshold_high, diff_range_high, color='lightblue', alpha=0.3, label='{} difference distance border'.format(dqd_t))
-    #     splts.fill_between(index, diff_range_high, diff_range_low, color='lightblue', alpha=0.8, label='Normal Behavior')
-    #     splts.fill_between(index, diff_range_low, diff_threshold_low, color='lightblue', alpha=0.4)
-    #     temp_df['diff'].plot(ax=splts, color='mediumslateblue')
-    #     s_diff = temp_df['diff'][(temp_df['diff_qd'] > dqd_t)]
-    #     splts.scatter(y=s_diff.values, x=s_diff.index.values, color='orange', marker='x', label='Anomalies')
-    #     splts.set_title('Anomalies against difference distance threshold {}'.format(dqd_t))
-    #     splts.legend(bbox_to_anchor=(1,0), loc="lower right", bbox_transform=_.transFigure, ncol=3)
-    #
-    #     #plt.xticks(index, time_ticks, rotation=90)
-    #     plt.show()
+    def final_plot(temp_df, qd_t, dqd_t):
+        _, splts = plt.subplots(1, sharex = True, sharey=True)
+        index = list()
+        range_high = list()
+        range_low = list()
+        threshold_high = list()
+        threshold_low = list()
+        diff_range_high = list()
+        diff_range_low = list()
+        diff_threshold_high = list()
+        diff_threshold_low = list()
+        qd = list()
+        diff_qd = list()
+        for i in temp_df.index.values:
+            index.append(i)
+            range_high.append(temp_df.loc[i]['q3'])
+            range_low.append(temp_df.loc[i]['q1'])
+            threshold_high.append(temp_df.loc[i]['q3'] + qd_t)
+            threshold_low.append(temp_df.loc[i]['q1'] - qd_t)
+
+            diff_range_high.append(temp_df.loc[i]['diff_q3'])
+            diff_range_low.append(temp_df.loc[i]['diff_q1'])
+            diff_threshold_high.append(temp_df.loc[i]['diff_q3'] + dqd_t)
+            diff_threshold_low.append(temp_df.loc[i]['diff_q1'] - dqd_t)
+
+
+            qd.append(temp_df.loc[i]['qd'])
+            diff_qd.append(temp_df.loc[i]['diff_qd'])
+
+        #splts.fill_between(index, threshold_high, range_high, color='lightblue', alpha=0.3, label='{} quartile distance'.format(qd_t))
+        #splts.fill_between(index, range_high, range_low, color='lightblue', alpha=0.8, label='Normal Behavior (1st to 3rd quartile)')
+        #splts.fill_between(index, range_low, threshold_low, color='lightblue', alpha=0.4)
+        temp_df['value'].plot(ax=splts, color='mediumslateblue')
+        s = temp_df[temp_df['qd'] > qd_t]['value']
+        splts.scatter(y=s.values, x=s.index.values, color='red', marker='o', label='Anomalies based on point-distance')
+
+        s2 = temp_df[temp_df['diff_qd'] > dqd_t]['value']
+        splts.scatter(y=s2.values, x=s2.index.values, color='orange', marker='x', label='Anomalies based on difference-distance')
+
+        s3 = temp_df[temp_df['wvs'] == 1000]['value']
+        splts.scatter(y=s3.values, x=s3.index.values, color='black', marker='s', label='Non-contextual anomalies')
+
+        splts.set_title('Anomalies against threshold pair ({}, {})'.format(qd_t, dqd_t))
+        splts.legend(bbox_to_anchor=(1,0), loc="lower right", bbox_transform=_.transFigure, ncol=3)
+        plt.show()
+
+        _, splts = plt.subplots(1, sharex = True, sharey=True)
+        splts.fill_between(index, threshold_high, range_high, color='lightblue', alpha=0.3, label='{} point distance border'.format(qd_t))
+        splts.fill_between(index, range_high, range_low, color='lightblue', alpha=0.8, label='Normal Behavior')
+        splts.fill_between(index, range_low, threshold_low, color='lightblue', alpha=0.4)
+        temp_df['value'].plot(ax=splts, color='mediumslateblue')
+        s_diff = temp_df['value'][(temp_df['qd'] > qd_t)]
+        splts.scatter(y=s_diff.values, x=s_diff.index.values, color='orange', marker='x', label='Anomalies')
+        splts.set_title('Anomalies against point distance threshold {}'.format(qd_t))
+        splts.legend(bbox_to_anchor=(1,0), loc="lower right", bbox_transform=_.transFigure, ncol=3)
+
+        _, splts = plt.subplots(1, sharex = True, sharey=True)
+        splts.fill_between(index, diff_threshold_high, diff_range_high, color='lightblue', alpha=0.3, label='{} difference distance border'.format(dqd_t))
+        splts.fill_between(index, diff_range_high, diff_range_low, color='lightblue', alpha=0.8, label='Normal Behavior')
+        splts.fill_between(index, diff_range_low, diff_threshold_low, color='lightblue', alpha=0.4)
+        temp_df['diff'].plot(ax=splts, color='mediumslateblue')
+        s_diff = temp_df['diff'][(temp_df['diff_qd'] > dqd_t)]
+        splts.scatter(y=s_diff.values, x=s_diff.index.values, color='orange', marker='x', label='Anomalies')
+        splts.set_title('Anomalies against difference distance threshold {}'.format(dqd_t))
+        splts.legend(bbox_to_anchor=(1,0), loc="lower right", bbox_transform=_.transFigure, ncol=3)
+
+        #plt.xticks(index, time_ticks, rotation=90)
+        plt.show()
 
 
 
@@ -274,7 +276,7 @@ class TAF:
             an_list = raw_df[raw_df[col] > threshold_mean]
             an_list = an_list.sort_values(col)
             anomaly_count = len(an_list)
-            print('threshold_high {}, threshold_mean {}, threshold_low {}'.format(threshold_high, threshold_mean, threshold_low))
+            # print('threshold_high {}, threshold_mean {}, threshold_low {}'.format(threshold_high, threshold_mean, threshold_low))
             closest_five = an_list['oi'][:5].values.tolist()
             # print(closest_five)
 

@@ -1,12 +1,12 @@
 const {app, BrowserWindow, ipcMain, dialog} = require('electron')
-const path = require('path')
-const http = require('http')
 const {PythonShell} = require('python-shell')
-const querystring = require('querystring');
+const path = require('path')
+const reload = require('electron-reload')(__dirname)
 
 var mainWindow
 var detectWindow
 var shell
+
 
 function createMainWindow () {
   mainWindow = new BrowserWindow({
@@ -23,6 +23,7 @@ function createMainWindow () {
 }
 app.whenReady().then(createMainWindow)
 
+
 function loadResults(results, data) {
   mainWindow.loadFile('src/results.html')
   mainWindow.webContents.on('did-finish-load', () => {
@@ -30,12 +31,15 @@ function loadResults(results, data) {
   })
 }
 
+
 function refreshInteractive() {
   detectWindow.loadFile('src/interactive.html')
   detectWindow.once('ready-to-show', () => {
     detectWindow.show()
   })
 }
+
+
 
 ipcMain.on('start-tsadf', (event, data) => {
   detectWindow = new BrowserWindow({
@@ -54,60 +58,32 @@ ipcMain.on('start-tsadf', (event, data) => {
     detectWindow.show()
   })
 
-  const parameters = {
-  	t: data.file,
-    f: 96,
-  	m: data.tsm,
-    l: data.lowerbound,
-    b: data.upperbound
-  }
-
-  const auto_options = {
-    hostname: '127.0.0.1',
-    port: 5000,
-    path: '/?' + querystring.stringify(parameters),
-    method: 'GET'
-  }
-
-  const int_options = {
+  let options = {
     mode: 'text',
     pythonPath: 'python',
     pythonOptions: ['-u'],
-    scriptPath: path.join(__dirname, '../flask/tsadf'),
-    args: ['-t=' + data.file, '-f=96', '-m=' + data.tsm, '-l=' + data.lowerbound, '-b=' + data.upperbound]
+    scriptPath: path.join(__dirname, 'code'),
+    args: ['-t=' + data.file, '-f=96', '-m=' + data.tsm, '-s=' + data.seasonality, '-l=' + data.lowerbound, '-b=' + data.upperbound]
   };
 
   if (data.tsm == 'automatic') {
-    callback = function(response) {
+    shell = PythonShell.run('main.py', options, function (err, results) {
       console.log('started auto-detect mode');
-      var results = '';
-
-      response.on('data', function (chunk) {
-        results += chunk;
-      });
-
-      response.on('end', function () {
-        console.log(results);
-        loadResults(JSON.parse(results), data)
-        detectWindow.close()
-        console.log('finished');
-      });
-    }
-    request = http.request(auto_options, callback).end();
-
+      loadResults(results, data)
+      detectWindow.close()
+      console.log('finished');
+    })
   } else {
     var results = []
-    shell = new PythonShell('main.py', int_options)
+    shell = new PythonShell('main.py', options)
     console.log('started interactive mode');
     shell.on('message', function (message) {
       results.push(message)
       if (message == 'case') {
         console.log(message);
         refreshInteractive()
-        shell.send('y')
       } else if (message == 'finished') {
         console.log(message);
-        console.log(results[results.length - 2])
         loadResults(results, data)
         detectWindow.close()
       }
@@ -139,10 +115,19 @@ ipcMain.on('plot-preview', (event) => {
   console.log('test');
 })
 
+
+// Quit when all windows are closed.
 app.on('window-all-closed', function () {
+  // On macOS it is common for applications and their menu bar
+  // to stay active until the user quits explicitly with Cmd + Q
   if (process.platform !== 'darwin') app.quit()
 })
 
 app.on('activate', function () {
+  // On macOS it's common to re-create a window in the app when the
+  // dock icon is clicked and there are no other windows open.
   if (BrowserWindow.getAllWindows().length === 0) createWindow()
 })
+
+// In this file you can include the rest of your app's specific main process
+// code. You can also put them in separate files and require them here.
