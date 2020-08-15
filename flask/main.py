@@ -15,16 +15,14 @@ def data():
     lower = request.args.get('l')
     higher = request.args.get('b')
     plot = request.args.get('p')
+
+    if not plot:
+        plot == False
+
     if not ts or not freq:
         return "Incomplete request: please provide (at least) time series file and time series frequency."
 
-    # p = Process(target=detect, args=('tsadf/sample_data.csv', 96, 'interactive', 0, 100000,))
-    # p.start()
-    # p.join()
-
-    return jsonify(detect(ts, freq, method, lower, higher))
-
-    # response = send_file(tempFileObj, as_attachment=True, attachment_filename='detailed_plot.png')
+    return jsonify(detect(ts, freq, method, lower, higher, plot))
 
 @app.route("/interactive", methods=['POST'])
 def send_bool():
@@ -34,4 +32,4 @@ def send_bool():
 
 if __name__ == "__main__":
     # app.run(host='127.0.0.1', port=5000, debug=True)
-    socketio.run(app, port=8000, debug=True)
+    socketio.run(app, debug=True)
