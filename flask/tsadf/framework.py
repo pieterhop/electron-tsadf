@@ -40,7 +40,7 @@ class TAF:
             self._calculate_mz()
 
 
-    def detect_anomalies(self):
+    async def detect_anomalies(self):
         extreme_an_df = self.anomaly_df[self.anomaly_df['wvs'] == str(self.range)]['value']
         point_an_df = 0
         diff_an_df = 0
@@ -69,11 +69,8 @@ class TAF:
           "extreme_anomalies": len(extreme_an_df)
         }
 
-        if self.threshold_method == "automatic":
-            return results
-        else:
-            print(results)
-            print("finished")
+        print(results)
+        await self.websocket.send(json.dumps(results))
 
     def _detailed_plot(self, raw_df, col, val_col, an_index, data_points=300, threshold=0, anomaly_count=0):
 
@@ -278,12 +275,11 @@ class TAF:
 
             detailed_plot = self._detailed_plot(raw_df, col, value_col, closest_five, data_points, threshold_mean, anomaly_count)
             print("Start sending...")
-            await self.websocket.send({"type": "image", "message": detailed_plot})
+            await self.websocket.send(detailed_plot)
             print("Send! Awaiting choice...")
 
             choice = await self.websocket.recv()
-            print("Received choice")
-            print(choice)
+            print("Received choice!")
 
             if choice == 'yes':
                 intermediate_results.append({'threshold': threshold_mean, 'anomalies': len(an_list)})

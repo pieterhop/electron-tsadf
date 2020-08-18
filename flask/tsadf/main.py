@@ -46,21 +46,20 @@ async def detect(tsfile, tsfreq, method, lowboundary, highboundary, plot, websoc
         taf.detect_stronger_seasonality(['DAILY', 'WEEKLY'])
         taf.calc_scores()
         await taf.threshold_selection()
-        return taf.detect_anomalies()
+        return await taf.detect_anomalies()
 
 async def handler(websocket, path):
-    print("New client!")
+    print("New client")
     args = await websocket.recv()
-    print("Arguments received!")
+    print("Arguments received")
     args = json.loads(args)
-    print(args['file'])
     await detect(args['file'], args['tsf_amount'], args['tsm'], args['lowerbound'], args['upperbound'], False, websocket)
 
 def start_socket():
     global websocket, path
     websocket = "localhost"
     path = 4567
-    start_server = websockets.serve(handler, websocket, path)
+    start_server = websockets.serve(handler, websocket, path, compression=None)
     asyncio.get_event_loop().run_until_complete(start_server)
     print("Started server")
     asyncio.get_event_loop().run_forever()

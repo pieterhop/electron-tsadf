@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self'; img-src 'self' data:;">
     <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'">
     <link rel="stylesheet" href="css/bootstrap/bootstrap.css" />
     <link rel="stylesheet" href="css/main/index.css" />
@@ -14,15 +14,8 @@
       <p class="desc"></p>
       <div class="row">
         <div class="col-sm-6">
-          <img id="plot" src="img/temp/detailed_plot.png" height="300" width="400" alt="plot">
+          <img id="plot" src="" height="300" width="400" alt="plot">
           <div id="message">Do you think most of the red points are outliers?</div>
-          <!-- <form id="interactive" class="form-group" action="http://127.0.0.1:5000/interactive" method="post">
-            <button id="boolean-no" type="button" name="boolean" class="btn btn-secondary" value="no" onclick="document.getElementById('interactive').submit()">No</button>
-            <button id="boolean-yes" type="button" name="boolean" class="btn btn-secondary" value="yes" onclick="document.getElementById('interactive').submit()">Yes</button>
-            <input type="checkbox" id="yes-bool" name="boolean" value="yes">
-            <input type="checkbox" id="no-bool" name="boolean" value="no">
-            <button type="submit" name="button">Sumbit</button>
-          </form> -->
           <button id="boolean-no" type="button" name="boolean" class="btn btn-secondary">No</button>
           <button id="boolean-yes" type="button" name="boolean" class="btn btn-secondary">Yes</button>
           <button id="close-modal" type="button" name="button" class="btn btn-secondary">Cancel</button>

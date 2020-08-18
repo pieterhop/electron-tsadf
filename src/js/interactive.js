@@ -1,15 +1,17 @@
 const {ipcRenderer, shell} = require('electron')
 
-document.getElementById('boolean-no').onclick = function() {
-  websocket.send("no");
-	reset();
-}
+ipcRenderer.on('image', (event, socket, img) => {
+  document.getElementById('plot').src = "data:image/png;base64, " + img.toString();
 
-document.getElementById('boolean-yes').onclick = function() {
-  websocket.send("yes");
-	reset();
-}
+	document.getElementById('boolean-no').onclick = function() {
+	  ipcRenderer.send('boolean', 'no')
+	}
 
-document.getElementById('close-modal').onclick = function() {
-  ipcRenderer.send('close-modal')
-}
+	document.getElementById('boolean-yes').onclick = function() {
+	  ipcRenderer.send('boolean', 'yes')
+	}
+
+	document.getElementById('close-modal').onclick = function() {
+	  ipcRenderer.send('close-modal')
+	}
+})

@@ -1,13 +1,11 @@
 const {app, BrowserWindow, ipcMain, dialog} = require('electron')
 const path = require('path')
 const http = require('http')
-// const PythonShell = require('python-shell')
 const querystring = require('querystring');
 const WebSocket = require('ws');
 
 var mainWindow
 var detectWindow
-var shell
 
 function createMainWindow () {
   mainWindow = new BrowserWindow({
@@ -31,10 +29,10 @@ function loadResults(results, data) {
   })
 }
 
-function refreshInteractive() {
+function refreshInteractive(socket, img) {
   detectWindow.loadFile('src/interactive.html')
-  detectWindow.once('ready-to-show', () => {
-    detectWindow.show()
+  detectWindow.webContents.on('did-finish-load', () => {
+    detectWindow.webContents.send('image', socket, img)
   })
 }
 
@@ -63,14 +61,6 @@ ipcMain.on('start-tsadf', (event, data) => {
     b: data.upperbound
   }
 
-  // const int_options = {
-  //   mode: 'text',
-  //   pythonPath: 'python',
-  //   pythonOptions: ['-u'],
-  //   scriptPath: path.join(__dirname, '../flask/tsadf'),
-  //   args: ['-t=' + data.file, '-f=96', '-m=' + data.tsm, '-l=' + data.lowerbound, '-b=' + data.upperbound]
-  // };
-
   if (data.tsm == 'automatic') {
     callback = function(response) {
       console.log('started auto-detect mode');
@@ -90,32 +80,34 @@ ipcMain.on('start-tsadf', (event, data) => {
     request = http.request(auto_options, callback).end();
 
   } else {
-
-    // const socket = io.connect('ws://localhost:4567');
-
-    socket = new WebSocket("ws://localhost:4567");
+    socket = new WebSocket("ws://localhost:4567", { perMessageDeflate: false });
     console.log("Connection established");
 
     setTimeout(() => {
       socket.send(JSON.stringify(data));
+      console.log("Arguments send...");
     }, 200);
 
     socket.onmessage = function (event) {
-    	data = JSON.parse(event.data)
-    	console.log(data);
-    	if (data.type === "image") {
-    		console.log('GOT IT!');
-    	}
+      if (Buffer.isBuffer(event.data)) {
+        console.log("Image received!");
+        // console.log(event.data.toString());
+      	refreshInteractive(socket, event.data)
+      } else {
+        console.log("Results received!");
+        loadResults(JSON.parse(event.data), data)
+        detectWindow.close()
+      }
     }
+
+    ipcMain.on('boolean', (event, boolean) => {
+      socket.send(boolean)
+    })
   }
 })
 
-ipcMain.on('boolean', (event, boolean) => {
-  shell.send(boolean)
-})
-
 ipcMain.on('close-modal', (event) => {
-  console.log('process canceled');
+  console.log('Process canceled');
   detectWindow.close()
 })
 
