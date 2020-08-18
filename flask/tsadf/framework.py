@@ -8,6 +8,7 @@ import json
 from time import sleep
 from io import BytesIO
 import base64
+import asyncio
 
 from timedataframe import TimeDataFrame
 from anomalydetection import AD
@@ -15,23 +16,24 @@ from anomalydetection import AD
 import utility
 
 class TAF:
-    def __init__(self, ts, ts_freq, method='automatic', range_lower_limit=0, range_higher_limit=1000000):
+    def __init__(self, ts, ts_freq, websocket, method='automatic', range_lower_limit=0, range_higher_limit=1000000):
         self.ts = ts
         self.ts_freq = ts_freq
         self.threshold_method = method
-        self.range = (range_lower_limit, range_higher_limit)
+        self.range = int(range_higher_limit) - int(range_lower_limit)
+        self.websocket = websocket
 
     def detect_stronger_seasonality(self, seasonality_list=['WEEKLY, DAILY']):
         self.preprocess_weekly_daily_data(seasonality_list)
 
     def calc_scores(self):
-        self.ad = AD(self.ts, self.ts_freq, self.season, str(int(self.range[1]) + 1), 'scores.csv')
+        self.ad = AD(self.ts, self.ts_freq, self.season, str(self.range), 'scores.csv')
         self.anomaly_df = self.ad.get_updated_df()
 
-    def threshold_selection(self):
+    async def threshold_selection(self):
         if self.threshold_method != 'automatic':
-            self.point_distance_score_threshold, itermediate_thresholds1 = self._determine_threshold(self.anomaly_df, 'PDS')
-            self.difference_distance_score_threshold, itermediate_thresholds2 = self._determine_threshold(self.anomaly_df, 'DDS')
+            self.point_distance_score_threshold, itermediate_thresholds1 = await self._determine_threshold(self.anomaly_df, 'PDS')
+            self.difference_distance_score_threshold, itermediate_thresholds2 = await self._determine_threshold(self.anomaly_df, 'DDS')
             # print(itermediate_thresholds1)
             # print(itermediate_thresholds2)
         else:
@@ -39,8 +41,7 @@ class TAF:
 
 
     def detect_anomalies(self):
-
-        extreme_an_df = self.anomaly_df[self.anomaly_df['wvs'] == str(int(self.range[1]) + 1)]['value']
+        extreme_an_df = self.anomaly_df[self.anomaly_df['wvs'] == str(self.range)]['value']
         point_an_df = 0
         diff_an_df = 0
         only_point_an_df = 0
@@ -157,21 +158,14 @@ class TAF:
         plt.subplots_adjust(top=0.94,bottom=0.075,left=0.04,right=0.97,hspace=0.5,wspace=0.095)
         f.suptitle('Current threshold {}, # of anomalies detected {}'.format(threshold, anomaly_count))
         # plt.show()
-        plt.savefig('src/img/temp/detailed_plot.png', dpi=500)
+        # plt.savefig('src/img/temp/detailed_plot.png', dpi=500)
 
-        # buf = BytesIO()
-        # fig1 = plt.savefig(buf, format='png', dpi=300)
-        # buf.seek(0)
-        #
-        # fig_data = base64.b64encode(buf.getvalue())
-        # buf.close()
-        #
-        # data = {
-        #     "type": "fig",
-        #     "fig": fig_data
-        # }
-        #
-        # print(data)
+        buf = BytesIO()
+        fig1 = plt.savefig(buf, format='png', dpi=300)
+        buf.seek(0)
+        fig_data = base64.b64encode(buf.getvalue())
+        buf.close()
+        return fig_data
 
 
     def preview_plot(self):
@@ -256,8 +250,7 @@ class TAF:
         plt.show()
 
 
-
-    def _determine_threshold(self, raw_df, score_type):
+    async def _determine_threshold(self, raw_df, score_type):
         value_col = 'value'
         if score_type == 'PDS':
             col = 'qd'
@@ -271,6 +264,7 @@ class TAF:
 
         intermediate_results = []
         while (threshold_high > (threshold_low+1)):
+            # sleep(5)
             threshold_mean = math.ceil((threshold_high + threshold_low) / 2)
 
             an_list = raw_df[raw_df[col] > threshold_mean]
@@ -281,12 +275,17 @@ class TAF:
             # print(closest_five)
 
             data_points = 100
-            self._detailed_plot(raw_df, col, value_col, closest_five, data_points, threshold_mean, anomaly_count)
 
-            choice = input('case\n')
-            print('answer: ' + choice)
+            detailed_plot = self._detailed_plot(raw_df, col, value_col, closest_five, data_points, threshold_mean, anomaly_count)
+            print("Start sending...")
+            await self.websocket.send({"type": "image", "message": detailed_plot})
+            print("Send! Awaiting choice...")
 
-            if choice == 'y':
+            choice = await self.websocket.recv()
+            print("Received choice")
+            print(choice)
+
+            if choice == 'yes':
                 intermediate_results.append({'threshold': threshold_mean, 'anomalies': len(an_list)})
                 threshold_high = threshold_mean
                 valid_threshold = threshold_mean
@@ -296,6 +295,7 @@ class TAF:
                 threshold_low = threshold_mean
 
         return valid_threshold, intermediate_results
+
 
     def _calculate_mz(self):
         self.anomaly_df['qd_mz'] = 0

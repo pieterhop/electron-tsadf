@@ -1,6 +1,9 @@
 import os
 import sys
 import argparse
+import websockets
+import asyncio
+import json
 
 path = './'
 exclude = [".git", "__pycache__", "node_modules", "ui", "js", "css", "data"]
@@ -26,7 +29,8 @@ def input():
     args = vars(ap.parse_args())
     return args
 
-def detect(tsfile, tsfreq, method, lowboundary, highboundary, plot):
+async def detect(tsfile, tsfreq, method, lowboundary, highboundary, plot, websocket):
+    print("Start detection...")
     try:
         TDF = TimeDataFrame(tsfile)
         ts = TDF.fetch_series(TDF.fetch_keys()[1])
@@ -34,16 +38,35 @@ def detect(tsfile, tsfreq, method, lowboundary, highboundary, plot):
         print('Error: {}'.format(e))
         exit(0)
 
-    taf = TAF(ts, tsfreq, method, lowboundary, highboundary)
-    
+    taf = TAF(ts, tsfreq, websocket, method, lowboundary, highboundary)
+
     if plot:
         taf.preview_plot()
     else:
         taf.detect_stronger_seasonality(['DAILY', 'WEEKLY'])
         taf.calc_scores()
-        taf.threshold_selection()
+        await taf.threshold_selection()
         return taf.detect_anomalies()
 
+async def handler(websocket, path):
+    print("New client!")
+    args = await websocket.recv()
+    print("Arguments received!")
+    args = json.loads(args)
+    print(args['file'])
+    await detect(args['file'], args['tsf_amount'], args['tsm'], args['lowerbound'], args['upperbound'], False, websocket)
+
+def start_socket():
+    global websocket, path
+    websocket = "localhost"
+    path = 4567
+    start_server = websockets.serve(handler, websocket, path)
+    asyncio.get_event_loop().run_until_complete(start_server)
+    print("Started server")
+    asyncio.get_event_loop().run_forever()
+
+
 if __name__ == '__main__':
-    args = input()
-    detect(args['tsfile'], args['tsfreq'], args['method'], args['lowboundary'], args['highboundary'], args['plot'])
+    start_socket()
+    # args = input()
+    # detect(args['tsfile'], args['tsfreq'], args['method'], args['lowboundary'], args['highboundary'], args['plot'])

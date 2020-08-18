@@ -1,8 +1,9 @@
 const {app, BrowserWindow, ipcMain, dialog} = require('electron')
 const path = require('path')
 const http = require('http')
-const {PythonShell} = require('python-shell')
+// const PythonShell = require('python-shell')
 const querystring = require('querystring');
+const WebSocket = require('ws');
 
 var mainWindow
 var detectWindow
@@ -62,20 +63,13 @@ ipcMain.on('start-tsadf', (event, data) => {
     b: data.upperbound
   }
 
-  const auto_options = {
-    hostname: '127.0.0.1',
-    port: 5000,
-    path: '/?' + querystring.stringify(parameters),
-    method: 'GET'
-  }
-
-  const int_options = {
-    mode: 'text',
-    pythonPath: 'python',
-    pythonOptions: ['-u'],
-    scriptPath: path.join(__dirname, '../flask/tsadf'),
-    args: ['-t=' + data.file, '-f=96', '-m=' + data.tsm, '-l=' + data.lowerbound, '-b=' + data.upperbound]
-  };
+  // const int_options = {
+  //   mode: 'text',
+  //   pythonPath: 'python',
+  //   pythonOptions: ['-u'],
+  //   scriptPath: path.join(__dirname, '../flask/tsadf'),
+  //   args: ['-t=' + data.file, '-f=96', '-m=' + data.tsm, '-l=' + data.lowerbound, '-b=' + data.upperbound]
+  // };
 
   if (data.tsm == 'automatic') {
     callback = function(response) {
@@ -96,25 +90,23 @@ ipcMain.on('start-tsadf', (event, data) => {
     request = http.request(auto_options, callback).end();
 
   } else {
-    var results = []
-    shell = new PythonShell('main.py', int_options)
-    console.log('started interactive mode');
-    shell.on('message', function (message) {
-      results.push(message)
-      if (message == 'case') {
-        console.log(message);
-        refreshInteractive()
-        shell.send('y')
-      } else if (message == 'finished') {
-        console.log(message);
-        console.log(results[results.length - 2])
-        loadResults(results, data)
-        detectWindow.close()
-      }
-      else {
-        console.log(message);
-      }
-    })
+
+    // const socket = io.connect('ws://localhost:4567');
+
+    socket = new WebSocket("ws://localhost:4567");
+    console.log("Connection established");
+
+    setTimeout(() => {
+      socket.send(JSON.stringify(data));
+    }, 200);
+
+    socket.onmessage = function (event) {
+    	data = JSON.parse(event.data)
+    	console.log(data);
+    	if (data.type === "image") {
+    		console.log('GOT IT!');
+    	}
+    }
   }
 })
 
@@ -123,8 +115,7 @@ ipcMain.on('boolean', (event, boolean) => {
 })
 
 ipcMain.on('close-modal', (event) => {
-  shell.terminate()
-  console.log('process terminated');
+  console.log('process canceled');
   detectWindow.close()
 })
 
