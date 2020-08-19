@@ -36,6 +36,13 @@ function refreshInteractive(socket, img) {
   })
 }
 
+function loadPreview(img) {
+  detectWindow.loadFile('src/preview.html')
+  detectWindow.webContents.on('did-finish-load', () => {
+    detectWindow.webContents.send('preview', img)
+  })
+}
+
 ipcMain.on('start-tsadf', (event, data) => {
   detectWindow = new BrowserWindow({
     width: 800,
@@ -53,64 +60,29 @@ ipcMain.on('start-tsadf', (event, data) => {
     detectWindow.show()
   })
 
-  const parameters = {
-  	t: data.file,
-    f: data.tsf_amount,
-  	m: data.tsm,
-    l: data.lowerbound,
-    b: data.upperbound
-  }
+  socket = new WebSocket("ws://localhost:4567", { perMessageDeflate: false });
+  console.log("Connection established");
 
-  const auto_options = {
-    hostname: '127.0.0.1',
-    port: 5000,
-    path: '/?' + querystring.stringify(parameters),
-    method: 'GET'
-  }
+  setTimeout(() => {
+    socket.send(JSON.stringify(data));
+    console.log("Arguments sent...");
+  }, 200);
 
-  if (data.tsm == 'automatic') {
-    callback = function(response) {
-      console.log('started auto-detect mode');
-      var results = '';
-
-      response.on('data', function (chunk) {
-        results += chunk;
-      });
-
-      response.on('end', function () {
-        console.log(results);
-        loadResults(JSON.parse(results), data)
-        detectWindow.close()
-        console.log('finished');
-      });
+  socket.onmessage = function (event) {
+    if (Buffer.isBuffer(event.data)) {
+      console.log("Image received!");
+      console.log(event.data);
+    	refreshInteractive(socket, event.data)
+    } else {
+      console.log("Results received!");
+      loadResults(JSON.parse(event.data), data)
+      detectWindow.close()
     }
-    request = http.request(auto_options, callback).end();
-
-  } else {
-
-    socket = new WebSocket("ws://localhost:4567", { perMessageDeflate: false });
-    console.log("Connection established");
-
-    setTimeout(() => {
-      socket.send(JSON.stringify(data));
-      console.log("Arguments sent...");
-    }, 200);
-
-    socket.onmessage = function (event) {
-      if (Buffer.isBuffer(event.data)) {
-        console.log("Image received!");
-      	refreshInteractive(socket, event.data)
-      } else {
-        console.log("Results received!");
-        loadResults(JSON.parse(event.data), data)
-        detectWindow.close()
-      }
-    }
-
-    ipcMain.on('boolean', (event, boolean) => {
-      socket.send(boolean)
-    })
   }
+
+  ipcMain.on('boolean', (event, boolean) => {
+    socket.send(boolean)
+  })
 })
 
 ipcMain.on('close-modal', (event) => {
@@ -126,6 +98,22 @@ ipcMain.on('return-main', (event) => {
 })
 
 ipcMain.on('plot-preview', (event, data) => {
+  detectWindow = new BrowserWindow({
+    width: 800,
+    height: 550,
+    parent: mainWindow,
+    modal: true,
+    show: false,
+    backgroundColor: '#383A3C',
+    webPreferences: {
+      nodeIntegration: true
+    }
+  })
+  detectWindow.loadFile('src/detect.html')
+  detectWindow.once('ready-to-show', () => {
+    detectWindow.show()
+  })
+
   socket = new WebSocket("ws://localhost:4567", { perMessageDeflate: false });
   console.log("Connection established");
 
@@ -137,8 +125,9 @@ ipcMain.on('plot-preview', (event, data) => {
   socket.onmessage = function (event) {
     if (Buffer.isBuffer(event.data)) {
       console.log("Plot received!");
-      console.log(event.data.toString());
-      // refreshInteractive(socket, event.data)
+      console.log(event.data);
+      loadPreview(event.data)
+      detectWindow.close()
     }
   }
 })

@@ -160,7 +160,6 @@ class TAF:
 
 
     async def preview_plot(self):
-        print('plot')
         _, splts = plt.subplots(1, sharex=True, sharey=True)
         self.anomaly_df['value'][0:100].plot(x='time', color='mediumslateblue')
         buf = BytesIO()
@@ -168,7 +167,7 @@ class TAF:
         buf.seek(0)
         fig_data = base64.b64encode(buf.getvalue())
         buf.close()
-        await self.websocket.send(detailed_plot)
+        await self.websocket.send(fig_data)
 
 
     def final_plot(temp_df, qd_t, dqd_t):

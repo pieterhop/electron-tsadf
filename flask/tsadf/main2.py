@@ -29,8 +29,24 @@ def input():
     args = vars(ap.parse_args())
     return args
 
-async def detect(tsfile, tsfreq, method, lowboundary, highboundary, plot, websocket):
-    print("Init...")
+def auto(tsfile, tsfreq, method, lowboundary, highboundary):
+    print("Start auto detection...")
+    try:
+        TDF = TimeDataFrame(tsfile)
+        ts = TDF.fetch_series(TDF.fetch_keys()[1])
+    except Exception as e:
+        print('Error: {}'.format(e))
+        exit(0)
+
+    taf = TAF(ts, tsfreq, None, method, lowboundary, highboundary)
+
+    taf.detect_stronger_seasonality(['DAILY', 'WEEKLY'])
+    taf.calc_scores()
+    taf.threshold_selection()
+    return taf.detect_anomalies()
+
+async def interactive(tsfile, tsfreq, method, lowboundary, highboundary, plot, websocket):
+    print("Start interactive detection...")
     try:
         TDF = TimeDataFrame(tsfile)
         ts = TDF.fetch_series(TDF.fetch_keys()[1])
@@ -40,14 +56,13 @@ async def detect(tsfile, tsfreq, method, lowboundary, highboundary, plot, websoc
 
     taf = TAF(ts, tsfreq, websocket, method, lowboundary, highboundary)
 
-    taf.detect_stronger_seasonality(['DAILY', 'WEEKLY'])
-    taf.calc_scores()
-    await taf.threshold_selection()
-    if plot == "True":
+    if plot:
         print("Start preview plot...")
-        return await taf.preview_plot()
+        taf.preview_plot()
     else:
-        print("Start detection...")
+        taf.detect_stronger_seasonality(['DAILY', 'WEEKLY'])
+        taf.calc_scores()
+        await taf.threshold_selection()
         return await taf.detect_anomalies()
 
 async def handler(websocket, path):
@@ -55,7 +70,7 @@ async def handler(websocket, path):
     args = await websocket.recv()
     print("Arguments received")
     args = json.loads(args)
-    await detect(args['file'], args['tsf_amount'], args['tsm'], args['lowerbound'], args['upperbound'], args['plot'], websocket)
+    await interactive(args['file'], args['tsf_amount'], args['tsm'], args['lowerbound'], args['upperbound'], websocket)
 
 def start_socket():
     start_server = websockets.serve(handler, "localhost", 4567, compression=None)
