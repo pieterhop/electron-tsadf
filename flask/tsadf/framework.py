@@ -16,7 +16,7 @@ from anomalydetection import AD
 import utility
 
 class TAF:
-    def __init__(self, ts, ts_freq, websocket, method='automatic', range_lower_limit=0, range_higher_limit=1000000):
+    def __init__(self, ts, ts_freq, websocket, method, range_lower_limit, range_higher_limit):
         self.ts = ts
         self.ts_freq = ts_freq
         self.threshold_method = method
@@ -34,8 +34,6 @@ class TAF:
         if self.threshold_method != 'automatic':
             self.point_distance_score_threshold, itermediate_thresholds1 = await self._determine_threshold(self.anomaly_df, 'PDS')
             self.difference_distance_score_threshold, itermediate_thresholds2 = await self._determine_threshold(self.anomaly_df, 'DDS')
-            # print(itermediate_thresholds1)
-            # print(itermediate_thresholds2)
         else:
             self._calculate_mz()
 
@@ -69,7 +67,6 @@ class TAF:
           "extreme_anomalies": len(extreme_an_df)
         }
 
-        print(results)
         await self.websocket.send(json.dumps(results))
 
     def _detailed_plot(self, raw_df, col, val_col, an_index, data_points=300, threshold=0, anomaly_count=0):
@@ -95,10 +92,7 @@ class TAF:
             if int(an_index[j] + data_points / 2) <= len(raw_df):
                 block_end = int(an_index[j] + data_points / 2)
 
-            # print('{}, {}, {}'.format(block_start, block_end, an_index[j]))
-
             try:
-
                 temp_df = raw_df[block_start:block_end]
                 temp_df = temp_df.reset_index(drop=True)
 
@@ -165,16 +159,16 @@ class TAF:
         return fig_data
 
 
-    def preview_plot(self):
+    async def preview_plot(self):
         print('plot')
         _, splts = plt.subplots(1, sharex=True, sharey=True)
         self.anomaly_df['value'][0:100].plot(x='time', color='mediumslateblue')
-        plt.show()
-
-        # df.plot(x='date_time', y='price_usd', figsize=(12,6))
-        # plt.xlabel('Date time')
-        # plt.ylabel('Price in USD')
-        # plt.title('Time Series of room price by date time of search');
+        buf = BytesIO()
+        fig1 = plt.savefig(buf, format='png', dpi=300)
+        buf.seek(0)
+        fig_data = base64.b64encode(buf.getvalue())
+        buf.close()
+        await self.websocket.send(detailed_plot)
 
 
     def final_plot(temp_df, qd_t, dqd_t):
@@ -202,13 +196,9 @@ class TAF:
             diff_threshold_high.append(temp_df.loc[i]['diff_q3'] + dqd_t)
             diff_threshold_low.append(temp_df.loc[i]['diff_q1'] - dqd_t)
 
-
             qd.append(temp_df.loc[i]['qd'])
             diff_qd.append(temp_df.loc[i]['diff_qd'])
 
-        #splts.fill_between(index, threshold_high, range_high, color='lightblue', alpha=0.3, label='{} quartile distance'.format(qd_t))
-        #splts.fill_between(index, range_high, range_low, color='lightblue', alpha=0.8, label='Normal Behavior (1st to 3rd quartile)')
-        #splts.fill_between(index, range_low, threshold_low, color='lightblue', alpha=0.4)
         temp_df['value'].plot(ax=splts, color='mediumslateblue')
         s = temp_df[temp_df['qd'] > qd_t]['value']
         splts.scatter(y=s.values, x=s.index.values, color='red', marker='o', label='Anomalies based on point-distance')
@@ -261,7 +251,6 @@ class TAF:
 
         intermediate_results = []
         while (threshold_high > (threshold_low+1)):
-            # sleep(5)
             threshold_mean = math.ceil((threshold_high + threshold_low) / 2)
 
             an_list = raw_df[raw_df[col] > threshold_mean]
@@ -276,7 +265,7 @@ class TAF:
             detailed_plot = self._detailed_plot(raw_df, col, value_col, closest_five, data_points, threshold_mean, anomaly_count)
             print("Start sending...")
             await self.websocket.send(detailed_plot)
-            print("Send! Awaiting choice...")
+            print("Sent! Awaiting choice...")
 
             choice = await self.websocket.recv()
             print("Received choice!")

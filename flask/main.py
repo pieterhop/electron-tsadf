@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def data():
-    ts = request.args.get('t')
+    ts = request.args.get('ts')
     freq = request.args.get('f')
     method = request.args.get('m')
     # seas = request.args.get('s')
@@ -18,18 +18,12 @@ def data():
     if not plot:
         plot == False
 
+    websocket = None
+
     if not ts or not freq:
         return "Incomplete request: please provide (at least) time series file and time series frequency."
 
-    return jsonify(detect(ts, freq, method, lower, higher, plot))
-
-
-@app.route("/interactive", methods=['POST'])
-def send_bool():
-    boolean = request.form['boolean']
-    print(boolean)
-    return redirect(url_for('data'))
-
+    return jsonify(detect(ts, freq, method, lower, higher, plot, websocket))
 
 if __name__ == "__main__":
     app.run(host='127.0.0.1', port=5000, debug=True)

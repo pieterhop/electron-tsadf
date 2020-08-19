@@ -29,7 +29,7 @@ def input():
     args = vars(ap.parse_args())
     return args
 
-async def detect(tsfile, tsfreq, method, lowboundary, highboundary, plot, websocket):
+def detect(tsfile, tsfreq, method, lowboundary, highboundary, plot, websocket):
     print("Start detection...")
     try:
         TDF = TimeDataFrame(tsfile)
@@ -40,20 +40,35 @@ async def detect(tsfile, tsfreq, method, lowboundary, highboundary, plot, websoc
 
     taf = TAF(ts, tsfreq, websocket, method, lowboundary, highboundary)
 
-    if plot:
-        taf.preview_plot()
+    if plot == 'True':
+        preview(taf)
+    elif method == 'automatic':
+        automatic(taf)
     else:
-        taf.detect_stronger_seasonality(['DAILY', 'WEEKLY'])
-        taf.calc_scores()
-        await taf.threshold_selection()
-        return await taf.detect_anomalies()
+        interactive(taf)
+
+def preview(taf):
+    taf.preview_plot()
+
+def automatic(taf):
+    taf.detect_stronger_seasonality(['DAILY', 'WEEKLY'])
+    taf.calc_scores()
+    taf.threshold_selection()
+    return taf.detect_anomalies()
+
+async def interactive(taf):
+    taf.detect_stronger_seasonality(['DAILY', 'WEEKLY'])
+    taf.calc_scores()
+    await taf.threshold_selection()
+    return await taf.detect_anomalies()
 
 async def handler(websocket, path):
     print("New client")
     args = await websocket.recv()
     print("Arguments received")
     args = json.loads(args)
-    await detect(args['file'], args['tsf_amount'], args['tsm'], args['lowerbound'], args['upperbound'], False, websocket)
+    print(args['plot'])
+    detect(args['file'], args['tsf_amount'], args['tsm'], args['lowerbound'], args['upperbound'], args['plot'], websocket)
 
 def start_socket():
     global websocket, path
@@ -64,8 +79,5 @@ def start_socket():
     print("Started server")
     asyncio.get_event_loop().run_forever()
 
-
 if __name__ == '__main__':
     start_socket()
-    # args = input()
-    # detect(args['tsfile'], args['tsfreq'], args['method'], args['lowboundary'], args['highboundary'], args['plot'])

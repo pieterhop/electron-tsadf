@@ -16,6 +16,7 @@ document.getElementById('start-tsadf-button').onclick = function() {
   data["tsf_unit"] = document.getElementById('tsf-unit').value
   data["seasonality"] = document.getElementById('seasonality').value
   data["tsm"] = document.getElementById('tsm').value
+  data["plot"] = "False"
 
   for (key in data) {
     if (data[key] == "") {
@@ -27,6 +28,36 @@ document.getElementById('start-tsadf-button').onclick = function() {
 
   if (invalid == false) {
     ipcRenderer.send('start-tsadf', data)
+  }
+}
+
+document.getElementById('plot-preview').onclick = function() {
+  var invalid = false
+  var data = {"file": ""}
+
+  if (document.getElementById('select-file').files[0] != undefined) {
+    data["file"] = document.getElementById('select-file').files[0].path
+  }
+  // temporary
+  data["file"] = path.join(__dirname, '../sample_data.csv')
+  data["lowerbound"]  = document.getElementById('lower-bound').value
+  data["upperbound"]  = document.getElementById('upper-bound').value
+  data["tsf_amount"] = document.getElementById('tsf-amount').value
+  data["tsf_unit"] = document.getElementById('tsf-unit').value
+  data["seasonality"] = document.getElementById('seasonality').value
+  data["tsm"] = document.getElementById('tsm').value
+  data["plot"] = "True"
+
+  for (key in data) {
+    if (data[key] == "") {
+      alert('Please fill in all required fields.')
+      invalid = true
+      return
+    }
+  }
+
+  if (invalid == false) {
+    ipcRenderer.send('plot-preview', data)
   }
 }
 

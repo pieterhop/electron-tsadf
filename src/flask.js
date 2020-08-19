@@ -55,10 +55,17 @@ ipcMain.on('start-tsadf', (event, data) => {
 
   const parameters = {
   	t: data.file,
-    f: 96,
+    f: data.tsf_amount,
   	m: data.tsm,
     l: data.lowerbound,
     b: data.upperbound
+  }
+
+  const auto_options = {
+    hostname: '127.0.0.1',
+    port: 5000,
+    path: '/?' + querystring.stringify(parameters),
+    method: 'GET'
   }
 
   if (data.tsm == 'automatic') {
@@ -80,18 +87,18 @@ ipcMain.on('start-tsadf', (event, data) => {
     request = http.request(auto_options, callback).end();
 
   } else {
+
     socket = new WebSocket("ws://localhost:4567", { perMessageDeflate: false });
     console.log("Connection established");
 
     setTimeout(() => {
       socket.send(JSON.stringify(data));
-      console.log("Arguments send...");
+      console.log("Arguments sent...");
     }, 200);
 
     socket.onmessage = function (event) {
       if (Buffer.isBuffer(event.data)) {
         console.log("Image received!");
-        // console.log(event.data.toString());
       	refreshInteractive(socket, event.data)
       } else {
         console.log("Results received!");
@@ -118,8 +125,22 @@ ipcMain.on('return-main', (event) => {
   })
 })
 
-ipcMain.on('plot-preview', (event) => {
-  console.log('test');
+ipcMain.on('plot-preview', (event, data) => {
+  socket = new WebSocket("ws://localhost:4567", { perMessageDeflate: false });
+  console.log("Connection established");
+
+  setTimeout(() => {
+    socket.send(JSON.stringify(data));
+    console.log("Arguments sent...");
+  }, 200);
+
+  socket.onmessage = function (event) {
+    if (Buffer.isBuffer(event.data)) {
+      console.log("Plot received!");
+      console.log(event.data.toString());
+      // refreshInteractive(socket, event.data)
+    }
+  }
 })
 
 app.on('window-all-closed', function () {
