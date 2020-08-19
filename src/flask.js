@@ -36,10 +36,10 @@ function refreshInteractive(socket, img) {
   })
 }
 
-function loadPreview(img) {
+function loadPreview(socket, img) {
   detectWindow.loadFile('src/preview.html')
   detectWindow.webContents.on('did-finish-load', () => {
-    detectWindow.webContents.send('preview', img)
+    detectWindow.webContents.send('preview', socket, img)
   })
 }
 
@@ -125,9 +125,7 @@ ipcMain.on('plot-preview', (event, data) => {
   socket.onmessage = function (event) {
     if (Buffer.isBuffer(event.data)) {
       console.log("Plot received!");
-      console.log(event.data);
-      loadPreview(event.data)
-      detectWindow.close()
+      loadPreview(socket, event.data)
     }
   }
 })

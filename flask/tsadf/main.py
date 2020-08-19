@@ -43,6 +43,7 @@ async def detect(tsfile, tsfreq, method, lowboundary, highboundary, plot, websoc
     taf.detect_stronger_seasonality(['DAILY', 'WEEKLY'])
     taf.calc_scores()
     await taf.threshold_selection()
+    
     if plot == "True":
         print("Start preview plot...")
         return await taf.preview_plot()
