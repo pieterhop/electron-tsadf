@@ -103,7 +103,7 @@ ipcMain.on('plot-preview', (event, data) => {
     modal: true,
     show: false,
     backgroundColor: '#383A3C',
-    webPreferences: {}
+    webPreferences: {
       nodeIntegration: true
     }
   })

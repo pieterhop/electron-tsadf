@@ -3,7 +3,7 @@
   "productName": "TSADF",
   "version": "1.0.0",
   "description": "A framework-based application for detecting anomalies in time-series data.",
-  "main": "src/js/main.js",
+  "main": "src/main.js",
   "scripts": {
     "start": "electron-forge start",
     "package": "electron-forge package",
@@ -47,7 +47,8 @@
     }
   },
   "dependencies": {
-    "electron-squirrel-startup": "^1.0.0"
+    "electron-squirrel-startup": "^1.0.0",
+    "ws": "^7.3.1"
   },
   "devDependencies": {
     "@electron-forge/cli": "^6.0.0-beta.50",
