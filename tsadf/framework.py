@@ -27,7 +27,7 @@ class TAF:
         self.preprocess_weekly_daily_data(seasonality_list)
 
     def calc_scores(self):
-        self.ad = AD(self.ts, self.ts_freq, self.season, str(self.range), 'scores.csv')
+        self.ad = AD(self.ts, self.ts_freq, str(self.range), self.season, 'scores.csv')
         self.anomaly_df = self.ad.get_updated_df()
 
     async def threshold_selection(self):

@@ -1,9 +1,7 @@
 /node_modules
-/src/img/temp/detailed_plot.png
-/flask/tsadf/scores.csv
-/flask/tsadf/evaluation
-/flask/test.py
-/flask/tsadf/paper_code.py
-/flask/tsadf/out.csv
+/tsadf/scores.csv
+/tsadf/evaluation
+/tsadf/paper_code.py
+/tsadf/out.csv
 __pycache__
 .DS_Store

@@ -9,9 +9,10 @@ document.getElementById('start-tsadf-button').onclick = function() {
     data["file"] = document.getElementById('select-file').files[0].path
   }
   // temporary
-  data["file"] = path.join(__dirname, '../sample_data.csv')
+  // data["file"] = path.join(__dirname, '../sample_data.csv')
   data["lowerbound"]  = document.getElementById('lower-bound').value
   data["upperbound"]  = document.getElementById('upper-bound').value
+  console.log(data["lowerbound"] + data["upperbound"]);
   data["tsf_amount"] = document.getElementById('tsf-amount').value
   data["tsf_unit"] = document.getElementById('tsf-unit').value
   data["seasonality"] = document.getElementById('seasonality').value
@@ -39,7 +40,7 @@ document.getElementById('plot-preview').onclick = function() {
     data["file"] = document.getElementById('select-file').files[0].path
   }
   // temporary
-  data["file"] = path.join(__dirname, '../sample_data.csv')
+  // data["file"] = path.join(__dirname, '../sample_data.csv')
   data["lowerbound"]  = document.getElementById('lower-bound').value
   data["upperbound"]  = document.getElementById('upper-bound').value
   data["tsf_amount"] = document.getElementById('tsf-amount').value

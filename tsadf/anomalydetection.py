@@ -21,7 +21,7 @@ from timedataframe import TimeDataFrame
 
 class AD:
 
-    def __init__(self, timeseries, freq, season='WEEKLY', default_wvs=100000, filename='scores.csv'):
+    def __init__(self, timeseries, freq, default_wvs, season='WEEKLY', filename='scores.csv'):
 
         self.freq = freq
         self.default_wvs= default_wvs
