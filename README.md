@@ -12,7 +12,7 @@ pip install websockets
 # Clone this repository
 git clone https://github.com/pieterhop/electron-tsadf
 # Go into the repository
-cd ~/electron-tsadf
+cd electron-tsadf
 # Install dependencies
 npm install
 # Start webscoket server
