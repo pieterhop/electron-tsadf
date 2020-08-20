@@ -69,7 +69,6 @@ ipcMain.on('start-tsadf', (event, data) => {
   socket.onmessage = function (event) {
     if (Buffer.isBuffer(event.data)) {
       console.log("Image received!");
-      console.log(event.data);
     	refreshInteractive(socket, event.data)
     } else {
       console.log("Results received!");
