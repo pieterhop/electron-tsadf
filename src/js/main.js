@@ -1,7 +1,5 @@
 const {app, BrowserWindow, ipcMain, dialog} = require('electron')
 const path = require('path')
-const http = require('http')
-const querystring = require('querystring');
 const WebSocket = require('ws');
 
 var mainWindow
