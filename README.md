@@ -7,18 +7,17 @@ TSADF is a cross-platform desktop application which can be used for detecting an
 To clone and run this repository you'll need [Git](https://git-scm.com) and [Node.js](https://nodejs.org/en/download/) (which comes with [npm](http://npmjs.com)) installed on your computer. From your command line:
 
 ```bash
-# Install flask
-pip install flask
+# Install python websockets
+pip install websockets
 # Clone this repository
 git clone https://github.com/pieterhop/electron-tsadf
 # Go into the repository
 cd ~/electron-tsadf
 # Install dependencies
 npm install
-# Start flask web-server
-python flask/main.py
-# Run the app
-# open new window
+# Start webscoket server
+python tsadf/main.py
+# In a new tab or window: run the app
 npm start
 ```
 
