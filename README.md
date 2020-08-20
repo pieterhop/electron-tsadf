@@ -20,6 +20,7 @@ python tsadf/main.py
 # In a new tab or window: run the app
 npm start
 ```
+Note: a known bug is that the select file button is unresponsive after a run or preview. Please restart the application with 'npm start' if this occurs. We're working on it.
 
 Note: use the provided time series file (sample_data.csv) for testing.
 
